@@ -1,0 +1,864 @@
+"use client";
+
+import { useMemo, useState, useEffect, useRef } from "react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  LayoutDashboard,
+  Users,
+  Car,
+  FileText,
+  BarChart3,
+  Settings,
+  UserCircle,
+  Calendar,
+  MapPin,
+  Building2,
+  Shield,
+} from "lucide-react";
+import Image from "next/image";
+import userAvatar from "../../assets/user-pic.png";
+import trinerta from "../../assets/trinetra.png";
+
+type MenuItem = {
+  label: string;
+  value: string;
+};
+
+type MenuSection = {
+  key: string;
+  label: string;
+  items: MenuItem[];
+};
+
+const MASTER_MENU_SECTIONS: MenuSection[] = [
+  {
+    key: "master",
+    label: "UC",
+    items: [{ label: "Corporate Form", value: "corporate-form" }],
+  },
+  {
+    key: "vendor",
+    label: "VENDOR",
+    items: [{ label: "Vendor Form Data", value: "vendor" }],
+  },
+  {
+    key: "vehicles",
+    label: "VEHICLES",
+    items: [{ label: "Vehicles Master", value: "vehicles" }],
+  },
+  {
+    key: "drivers",
+    label: "DRIVER",
+    items: [{ label: "Driver Form Data", value: "driver" }],
+  },
+];
+
+const ACCESS_MENU: MenuSection = {
+  key: "access-menu",
+  label: "Access Level",
+  items: [
+    { label: "City Access", value: "city-manager" },
+    { label: "Team Access", value: "team-leader" },
+    { label: "Sales Access", value: "sales-member" },
+    { label: "BDM Access", value: "bdm" },
+  ],
+};
+
+const LEADS_TRACK: MenuSection = {
+  key: "lead-track",
+  label: "Lead Track",
+  items: [{ label: "Lead Track", value: "lead-track" }],
+};
+
+const YEAR_MENU: MenuSection = {
+  key: "year-menu",
+  label: "Year",
+  items: [
+    { label: "FY 26", value: "2026" },
+    { label: "FY 27", value: "2027" },
+  ],
+};
+
+const SALES_MENU: MenuSection = {
+  key: "sales-menu",
+  label: "SALES",
+  items: [{ label: "Sales Lead Table", value: "sales-lead-table" }],
+};
+
+const REGIONS = ["North", "South", "East", "West"];
+
+const CITIES_BY_REGION: Record<string, string[]> = {
+  North: ["Delhi", "Jaipur", "Chandigarh"],
+  South: ["Bengaluru", "Chennai", "Hyderabad"],
+  East: ["Kolkata", "Patna", "Bhubaneswar"],
+  West: ["Mumbai", "Pune", "Ahmedabad"],
+};
+
+interface NavbarProps {
+  showAccess?: boolean;
+  showMaster?: boolean;
+  showLeadsMenu?: boolean;
+  showSalesMenu?: boolean;
+  showYearMenu?: boolean;
+  activeSection?: string | null;
+  activeMasterKey?: string | null;
+  activeLeadKey?: string | null;
+  activeDashboardKey?: string | null;
+  activeYearKey?: string | null;
+  activeAccessKey?: string | null;
+  onMasterSelect?: (key: string) => void;
+  onLeadSelect?: (key: string) => void;
+  onDashboardSelect?: (key: string) => void;
+  onSalesLeadSelect?: (key: string) => void;
+  onSalesEditFormSelect?: (key: string) => void;
+  onTlTablesSelect?: (key: string) => void;
+  onYearSelect?: (key: string) => void;
+  onAccessSelect?: (key: string) => void;
+  onTransferLeads?: () => void;
+  onSwapLeads?: () => void;
+  onTimeEnquiry?: () => void;
+  onMlReports?: () => void;
+  onMeReports?: () => void;
+  onMonthlyEnquiry?: () => void;
+  onEmpreport?: () => void;
+  onAeReports?: () => void;
+  onAnulReports?: () => void;
+  onAnulDestReports?: () => void;
+  onrules?: () => void;
+  onshortcuttable?: () => void;
+  onpresales?: () => void;
+  permittedMasterKeys?: string[] | null;
+  selectedRegion?: string;
+  selectedCity?: string;
+  onRegionChange?: (region: string) => void;
+  onCityChange?: (city: string) => void;
+  userName?: string;
+  roleLabel?: string;
+  userRole?: string;
+  onLogout?: () => void;
+}
+
+// Helper function to get icon based on menu type
+const getMenuIcon = (menuKey: string, label: string) => {
+  if (menuKey.includes("customer"))
+    return <Users size={16} className="mr-1.5" />;
+  if (menuKey.includes("master") || menuKey.includes("UC"))
+    return <Building2 size={16} className="mr-1.5" />;
+  if (menuKey.includes("vendor"))
+    return <FileText size={16} className="mr-1.5" />;
+  if (menuKey.includes("vehicle")) return <Car size={16} className="mr-1.5" />;
+  if (menuKey.includes("driver"))
+    return <UserCircle size={16} className="mr-1.5" />;
+  if (menuKey.includes("access"))
+    return <Shield size={16} className="mr-1.5" />;
+  if (label === "New Lead Form" || label === "Lead Table")
+    return <FileText size={16} className="mr-1.5" />;
+  if (label === "Lead Tracking") return <MapPin size={16} className="mr-1.5" />;
+  if (label === "Analytics") return <BarChart3 size={16} className="mr-1.5" />;
+  if (label === "Dashboards")
+    return <LayoutDashboard size={16} className="mr-1.5" />;
+  if (label === "Sales Lead Table")
+    return <Users size={16} className="mr-1.5" />;
+  return null;
+};
+
+export function Navbar({
+  showAccess = false,
+  showMaster = false,
+  showLeadsMenu = false,
+
+  showYearMenu = false,
+  activeMasterKey,
+  activeYearKey,
+  activeAccessKey,
+  onMasterSelect,
+  onLeadSelect,
+  onDashboardSelect,
+  onSalesLeadSelect,
+  onSalesEditFormSelect,
+  onTlTablesSelect,
+  onYearSelect,
+  onAccessSelect,
+  onTransferLeads,
+  onSwapLeads,
+  onTimeEnquiry,
+  onMlReports,
+  onMeReports,
+  onMonthlyEnquiry,
+  onEmpreport,
+  onAeReports,
+  onAnulReports,
+  onAnulDestReports,
+  onrules,
+  onshortcuttable,
+  onpresales,
+  permittedMasterKeys,
+  selectedRegion = "",
+  selectedCity = "",
+  onRegionChange,
+  onCityChange,
+  userName,
+  roleLabel,
+  userRole,
+  onLogout,
+}: NavbarProps) {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Ref for the navbar container
+  const navbarRef = useRef<HTMLDivElement>(null);
+
+  console.log("Navbar component loaded successfully");
+
+  const masterKeySet = useMemo(
+    () => (permittedMasterKeys ? new Set(permittedMasterKeys) : null),
+    [permittedMasterKeys],
+  );
+
+  const cityOptions = useMemo(() => {
+    if (!selectedRegion) {
+      return Object.values(CITIES_BY_REGION).reduce<string[]>(
+        (acc, group) => acc.concat(group),
+        [],
+      );
+    }
+    return CITIES_BY_REGION[selectedRegion] ?? [];
+  }, [selectedRegion]);
+
+  // Handle click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        navbarRef.current &&
+        !navbarRef.current.contains(event.target as Node)
+      ) {
+        setOpenMenu(null);
+      }
+    };
+
+    // Add event listener when any menu is open
+    if (openMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openMenu]);
+
+  const handleMasterSelect = (value: string) => {
+    onMasterSelect?.(value);
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleYearSelect = (value: string) => {
+    onYearSelect?.(value);
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleAccessSelect = (value: string) => {
+    onAccessSelect?.(value);
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleMonthlyEnquiry = () => {
+    onMonthlyEnquiry?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleEmpreport = () => {
+    onEmpreport?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleAeReports = () => {
+    onAeReports?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+  const handleAnulReports = () => {
+    onAnulReports?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+  const handleAnulDestReports = () => {
+    onAnulDestReports?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+  const handleRules = () => {
+    onrules?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleShortcut = () => {
+    onshortcuttable?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  const handleUnwanted = () => {
+    onpresales?.();
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
+
+  return (
+    <nav
+      ref={navbarRef}
+      className="w-full h-16 z-50 flex flex-col border-b border-gray-200 shadow-sm bg-orange-50  relative"
+    >
+      {/* Top bar with mobile menu button and user avatar */}
+      <div className="flex items-center h-16 w-full px-4 justify-between md:hidden">
+        <button
+          type="button"
+          className="flex items-center justify-center p-2 text-orange-600 transition border border-orange-200 rounded-full bg-white/80 hover:bg-white hover:shadow-md"
+          onClick={() => {
+            setMobileOpen((prev) => !prev);
+          }}
+          aria-expanded={mobileOpen}
+          aria-label="Toggle navigation"
+        >
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        <div className="flex items-center">
+          <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm border border-orange-100">
+            <Image
+              src={userAvatar}
+              alt="User"
+              width={28}
+              height={28}
+              className="object-cover border-2 border-orange-500 rounded-full"
+            />
+            <div className="text-left">
+              <p className="text-sm font-semibold text-gray-800">
+                {userName ?? "Guest"}
+              </p>
+              <p className="text-[11px] uppercase text-gray-500">{roleLabel}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main navigation - hidden on mobile, visible on desktop */}
+      <div
+        className={`${mobileOpen ? "block" : "hidden"} w-full px-4 pb-4 md:block md:pb-0`}
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:h-16">
+          {/* Left Section - Logo + Menu Items */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:flex-wrap md:gap-2 lg:gap-4">
+            {/* Logo Section */}
+            <div className="flex items-center gap-2 flex-shrink-0 h-full">
+              <Image
+                src={trinerta}
+                alt="logo"
+                width={250}
+                height={40}
+                className="rounded-xl hidden sm:block flex-shrink-0"
+              />
+            </div>
+
+            {/* MASTER SECTION */}
+            {showMaster && (
+              <>
+                {MASTER_MENU_SECTIONS.map((menu) => {
+                  const visibleItems = masterKeySet
+                    ? menu.items.filter((item) => masterKeySet.has(item.value))
+                    : menu.items;
+                  if (visibleItems.length === 0) {
+                    return null;
+                  }
+
+                  const isOpen = openMenu === menu.key;
+                  const menuIcon = getMenuIcon(menu.key, menu.label);
+
+                  return (
+                    <div key={menu.key} className="relative w-full md:w-auto">
+                      <button
+                        type="button"
+                        className={`w-full md:w-auto flex items-center justify-between gap-1 rounded-full px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-200 
+                          ${
+                            isOpen
+                              ? "bg-orange-600 text-white shadow-lg md:scale-105"
+                              : "bg-white text-orange-700 border-2 border-orange-300 hover:border-orange-500 hover:shadow-md hover:scale-[1.02]"
+                          } md:min-w-[100px] md:h-9 md:py-2`}
+                        onClick={() => {
+                          setOpenMenu((prev) =>
+                            prev === menu.key ? null : menu.key,
+                          );
+                        }}
+                        aria-expanded={openMenu === menu.key}
+                      >
+                        <span className="flex items-center truncate">
+                          {menuIcon}
+                          {menu.label}
+                        </span>
+                        <ChevronDown
+                          size={14}
+                          className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+
+                      {openMenu === menu.key && (
+                        <ul className="w-full md:absolute md:left-0 z-50 py-1 mt-1 bg-white border-2 border-orange-300 rounded-lg shadow-xl md:top-full md:w-56 max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                          {visibleItems.map((item) => {
+                            const isActive = item.value === activeMasterKey;
+                            return (
+                              <li
+                                key={item.value}
+                                onClick={() => handleMasterSelect(item.value)}
+                                className={`px-3 py-2.5 md:py-2 text-sm transition-all cursor-pointer flex items-center gap-2
+                                  ${
+                                    isActive
+                                      ? "bg-orange-600 text-white font-semibold"
+                                      : "text-gray-700 hover:bg-orange-50 hover:text-orange-700 hover:pl-4"
+                                  }`}
+                              >
+                                <span
+                                  className={`w-1 h-1 rounded-full ${isActive ? "bg-white" : "bg-orange-300"} transition-all`}
+                                ></span>
+                                {item.label}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
+
+            {/* LEADS MENU */}
+            {showLeadsMenu && (
+              <>
+                <div className="relative w-full md:w-auto">
+                  {(() => {
+                    const isOpen = openMenu === "lead-track-menu";
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          className={`w-full md:w-auto flex items-center justify-between gap-1 rounded-full px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-200
+                            ${
+                              isOpen
+                                ? "bg-green-600 text-white shadow-lg md:scale-105"
+                                : "bg-white text-green-700 border-2 border-green-300 hover:border-green-500 hover:shadow-md hover:scale-[1.02] hover:bg-green-50"
+                            } md:min-w-[100px] md:h-9 md:py-2`}
+                          onClick={() => {
+                            setOpenMenu((prev) =>
+                              prev === "lead-track-menu"
+                                ? null
+                                : "lead-track-menu",
+                            );
+                          }}
+                          aria-expanded={openMenu === "lead-track-menu"}
+                        >
+                          <span className="flex z-50 items-center truncate">
+                            <MapPin
+                              size={16}
+                              className="mr-1.5 flex-shrink-0"
+                            />
+                            Tracking
+                          </span>
+                          <ChevronDown
+                            size={14}
+                            className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                          />
+                        </button>
+
+                        {openMenu === "lead-track-menu" && (
+                          <ul className="w-full md:absolute md:left-0 z-50 py-1 mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl md:top-full md:w-56 max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                            <li
+                              onClick={() => {
+                                onTransferLeads?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Transfer Leads
+                            </li>
+                            <li
+                              onClick={() => {
+                                onSwapLeads?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Swap Leads
+                            </li>
+                            <li
+                              onClick={() => {
+                                onMonthlyEnquiry?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Monthly Enquiry
+                            </li>
+                            <li
+                              onClick={() => {
+                                handleEmpreport();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Employee Report
+                            </li>
+                            <li
+                              onClick={() => {
+                                onMlReports?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              LDR Report
+                            </li>
+                            <li
+                              onClick={() => {
+                                onMeReports?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              LWR Report
+                            </li>
+
+                            <li
+                              onClick={() => {
+                                onTimeEnquiry?.();
+                                setOpenMenu(null);
+                                setMobileOpen(false);
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Time Enquiry
+                            </li>
+                          </ul>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+
+                <div className="relative w-full md:w-auto">
+                  {(() => {
+                    const isOpen = openMenu === "analytics-menu";
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          className={`w-full md:w-auto flex items-center justify-between gap-1 rounded-full px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-200
+                            ${
+                              isOpen
+                                ? "bg-green-600 text-white shadow-lg md:scale-105"
+                                : "bg-white text-green-700 border-2 border-green-300 hover:border-green-500 hover:shadow-md hover:scale-[1.02] hover:bg-green-50"
+                            } md:min-w-[100px] md:h-9 md:py-2`}
+                          onClick={() => {
+                            setOpenMenu((prev) =>
+                              prev === "analytics-menu"
+                                ? null
+                                : "analytics-menu",
+                            );
+                          }}
+                          aria-expanded={openMenu === "analytics-menu"}
+                        >
+                          <span className="flex items-center truncate">
+                            <BarChart3
+                              size={16}
+                              className="mr-1.5 flex-shrink-0"
+                            />
+                            Analytics
+                          </span>
+                          <ChevronDown
+                            size={14}
+                            className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                          />
+                        </button>
+
+                        {openMenu === "analytics-menu" && (
+                          <ul className="w-full md:absolute md:left-0 z-50 py-1 mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl md:top-full md:w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <li
+                              onClick={() => {
+                                handleAeReports();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Annual Report
+                            </li>
+                            <li
+                              onClick={() => {
+                                handleAnulReports();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Annual Report 2
+                            </li>
+                            <li
+                              onClick={() => {
+                                handleAnulDestReports();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Annual Report 3
+                            </li>
+                            <li
+                              onClick={() => {
+                                handleRules();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Rules
+                            </li>
+
+                            <li
+                              onClick={() => {
+                                handleShortcut();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Master Tables
+                            </li>
+
+                            <li
+                              onClick={() => {
+                                handleUnwanted();
+                              }}
+                              className="px-3 py-2.5 md:py-2 text-sm transition-all hover:bg-green-50 hover:text-green-700 hover:pl-4 cursor-pointer text-gray-700 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-green-300"></span>
+                              Unwanted Lead{" "}
+                            </li>
+                          </ul>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              </>
+            )}
+
+            {/* ACCESS MENU */}
+            {showAccess && (
+              <div className="relative w-full md:w-auto">
+                {(() => {
+                  const isOpen = openMenu === ACCESS_MENU.key;
+                  const menuIcon = getMenuIcon(
+                    ACCESS_MENU.key,
+                    ACCESS_MENU.label,
+                  );
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        className={`w-full md:w-auto flex items-center justify-between gap-1 rounded-full px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-200
+                          ${
+                            isOpen
+                              ? "bg-yellow-600 text-white shadow-lg md:scale-105"
+                              : "bg-white text-yellow-700 border-2 border-yellow-300 hover:border-yellow-500 hover:shadow-md hover:scale-[1.02] hover:bg-yellow-50"
+                          } md:min-w-[100px] md:h-9 md:py-2`}
+                        onClick={() => {
+                          setOpenMenu((prev) =>
+                            prev === ACCESS_MENU.key ? null : ACCESS_MENU.key,
+                          );
+                        }}
+                        aria-expanded={openMenu === ACCESS_MENU.key}
+                      >
+                        <span className="flex items-center truncate">
+                          {menuIcon}
+                          {ACCESS_MENU.label}
+                        </span>
+                        <ChevronDown
+                          size={14}
+                          className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+
+                      {openMenu === ACCESS_MENU.key && (
+                        <ul className="w-full md:absolute md:left-0 z-50 py-1 mt-1 bg-white border-2 border-yellow-300 rounded-lg shadow-xl md:top-full md:w-56 max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                          {ACCESS_MENU.items.map((item) => {
+                            const isActive = item.value === activeAccessKey;
+                            return (
+                              <li
+                                key={item.value}
+                                onClick={() => handleAccessSelect(item.value)}
+                                className={`px-3 py-2.5 md:py-2 text-sm transition-all cursor-pointer flex items-center gap-2
+                                  ${
+                                    isActive
+                                      ? "bg-yellow-600 text-white font-semibold"
+                                      : "text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 hover:pl-4"
+                                  }`}
+                              >
+                                <span
+                                  className={`w-1 h-1 rounded-full ${isActive ? "bg-white" : "bg-yellow-300"} transition-all`}
+                                ></span>
+                                {item.label}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:ml-auto md:gap-2 lg:gap-3">
+            <div className="relative group w-full md:w-28 lg:w-32">
+              <select
+                value={selectedRegion}
+                onChange={(event) => {
+                  onRegionChange?.(event.target.value);
+                }}
+                className="w-full px-3 py-2.5 pr-8 text-sm font-semibold text-gray-700 bg-white border border-orange-500 rounded-full focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-200 appearance-none cursor-pointer hover:border-orange-300 transition-all md:h-9 md:py-2"
+              >
+                <option value="">Zone</option>
+                {REGIONS.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+              <MapPin
+                size={14}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-orange-500 transition-colors"
+              />
+            </div>
+
+            {/* City Select */}
+            <div className="relative group w-full md:w-28 lg:w-32">
+              <select
+                value={selectedCity}
+                onChange={(event) => {
+                  onCityChange?.(event.target.value);
+                }}
+                className="w-full px-3 py-2.5 pr-8 text-sm font-semibold text-gray-700 bg-white border border-orange-500 rounded-full focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-200 appearance-none cursor-pointer hover:border-orange-300 transition-all md:h-9 md:py-2"
+              >
+                <option value="">City</option>
+                {cityOptions.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+              <Building2
+                size={14}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-orange-500 transition-colors"
+              />
+            </div>
+
+            {/* Year Select */}
+            {showYearMenu && (
+              <div className="relative group w-full md:w-24 lg:w-28">
+                <select
+                  value={activeYearKey || ""}
+                  onChange={(event) => {
+                    handleYearSelect(event.target.value);
+                  }}
+                  className="w-full px-3 py-2.5 pr-8 text-sm font-semibold text-gray-700 bg-white border border-orange-500 rounded-full focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-200 appearance-none cursor-pointer hover:border-orange-300 transition-all md:h-9 md:py-2"
+                >
+                  <option value="">Year</option>
+                  {YEAR_MENU.items.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+                <Calendar
+                  size={14}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-orange-500 transition-colors"
+                />
+              </div>
+            )}
+
+            {/* User Menu - Desktop */}
+            <div className="hidden md:flex items-center">
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setOpenMenu(openMenu === "user" ? null : "user")
+                  }
+                  className={`flex items-center gap-2 rounded-full bg-white px-2 py-1 text-xs font-semibold text-gray-700 shadow-sm border-2 transition-all duration-200 hover:shadow-md hover:scale-[1.02]
+                    ${openMenu === "user" ? "border-orange-500 shadow-md" : "border-orange-300 hover:border-orange-500"}`}
+                >
+                  <Image
+                    src={userAvatar}
+                    alt="User"
+                    width={28}
+                    height={28}
+                    className="object-cover border-2 border-orange-500 rounded-full flex-shrink-0"
+                  />
+                  <div className="text-left hidden lg:block">
+                    <p className="text-sm font-semibold text-gray-800">
+                      {userName ?? "Guest"}
+                    </p>
+                    <p className="text-[11px] uppercase text-gray-500">
+                      {roleLabel}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    className={`ml-1 transition-transform duration-200 flex-shrink-0 ${openMenu === "user" ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {openMenu === "user" && (
+                  <div className="absolute right-0 z-50 mt-2 bg-white border-2 border-orange-300 rounded-lg shadow-xl top-full w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-amber-50 lg:hidden">
+                      <p className="text-sm font-medium text-gray-900">
+                        {userName ?? "Guest"}
+                      </p>
+                      <p className="text-xs text-gray-500">{roleLabel}</p>
+                    </div>
+                    {onLogout && (
+                      <button
+                        onClick={() => {
+                          onLogout();
+                          setOpenMenu(null);
+                        }}
+                        className="w-full px-4 py-2.5 md:py-2 text-sm text-left text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-all hover:pl-6 flex items-center gap-2"
+                      >
+                        <span className="w-1 h-1 rounded-full bg-orange-300"></span>
+                        Sign out
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
