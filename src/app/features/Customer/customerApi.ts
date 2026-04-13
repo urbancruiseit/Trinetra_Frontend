@@ -1,53 +1,152 @@
-import axios from "axios";
-import { CustomerRecord } from "@/types/types";
-import { baseApi } from "@/uitils/commonApi";
+import axiosInstance from "@/uitils/axiosInstance";
 
-const BASE_URL = `${baseApi}/customers`;
-export const createCustomerApi = async (
-  formData: CustomerRecord
-): Promise<any> => {
+export interface CustomerRecord {
+  id?: number;
+  uuid?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  customerName?: string;
+  customerPhone: string;
+  customerEmail?: string;
+  companyName?: string;
+  customerType?: string;
+  customerCategoryType?: string;
+  alternatePhone?: string;
+  countryName?: string;
+  customerCity?: string;
+  customerState?: string;
+  address?: string;
+  date_of_birth?: string;
+  anniversary?: string;
+  gender?: string;
+  state?: string;
+  pincode?: string;
+  city?: string;
+  cityId?: number;
+  stateId?: number;
+}
+
+// ─── FIELD MAPPER ─────────────────────────
+const mapFormToBackend = (
+  formData: Partial<CustomerRecord> & {
+    phone?: string;
+    email?: string;
+    dateOfBirth?: string;
+  },
+): Partial<CustomerRecord> => ({
+  firstName: formData.firstName || undefined,
+  middleName: formData.middleName || undefined,
+  lastName: formData.lastName || undefined,
+  customerPhone: formData.customerPhone || formData.phone!,
+  customerEmail: formData.customerEmail || formData.email || undefined,
+  alternatePhone: formData.alternatePhone || undefined,
+  date_of_birth: formData.date_of_birth || formData.dateOfBirth || undefined,
+  anniversary: formData.anniversary || undefined,
+  gender: formData.gender || undefined,
+  address: formData.address || undefined,
+  state: formData.state || undefined,
+  city: formData.city || undefined,
+  pincode: formData.pincode || undefined,
+  stateId: formData.stateId ?? undefined,
+  cityId: formData.cityId ?? undefined,
+  companyName: formData.companyName || undefined,
+  customerType: formData.customerType || undefined,
+  customerCategoryType: formData.customerCategoryType || undefined,
+  countryName: formData.countryName || undefined,
+  customerCity: formData.customerCity || undefined,
+  customerState: formData.customerState || undefined,
+});
+
+// ─── FETCH ALL CUSTOMERS ───────────────────
+export const fetchCustomersAPI = async (): Promise<CustomerRecord[]> => {
   try {
-    const response = await axios.post(BASE_URL, formData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const { data: res } = await axiosInstance.get("/newcustomer");
 
-    return response.data.data;
+    return res?.data?.customers || [];
   } catch (error: any) {
-    console.log("FULL ERROR:", error);
-    console.log("ERROR RESPONSE:", error?.response);
-    console.log("ERROR DATA:", error?.response?.data);
-    console.log("ERROR STATUS:", error?.response?.status);
-
-    throw error;
+    console.error(
+      "Error fetching customers:",
+      error.response?.data || error.message,
+    );
+    throw new Error(
+      error.response?.data?.message || "Error fetching customers",
+    );
   }
 };
 
-export const getAllCustomersApi = async () => {
-  const response = await axios.get(BASE_URL);
-  return response.data.data.customers;
+// ─── SEARCH CUSTOMERS ──────────────────────
+export const searchCustomersAPI = async (
+  searchTerm: string,
+): Promise<CustomerRecord[]> => {
+  try {
+    const { data: res } = await axiosInstance.get("/newcustomer/search", {
+      params: { search: searchTerm },
+    });
+
+    return (
+      res?.data?.customers ||
+      res?.customers ||
+      (Array.isArray(res) ? res : []) ||
+      []
+    );
+  } catch (error: any) {
+    console.error(
+      "Error searching customers:",
+      error.response?.data || error.message,
+    );
+    throw new Error(
+      error.response?.data?.message || "Error searching customers",
+    );
+  }
 };
 
-export const getCustomerByIdApi = async (uuid: string) => {
-  const response = await axios.get(`${BASE_URL}/${uuid}`);
-  return response.data.data;
+// ─── CREATE CUSTOMER ───────────────────────
+export const createCustomerAPI = async (
+  formData: Partial<CustomerRecord> & { phone?: string; email?: string },
+): Promise<CustomerRecord> => {
+  try {
+    const payload = mapFormToBackend(formData);
+
+    const { data: res } = await axiosInstance.post("/newcustomer", payload);
+
+    return res?.data?.customer || res?.data;
+  } catch (error: any) {
+    console.error(
+      "Error creating customer:",
+      error.response?.data || error.message,
+    );
+    throw new Error(error.response?.data?.message || "Error creating customer");
+  }
 };
 
-export const updateCustomerApi = async (
-  uuid: string,
-  data: CustomerRecord
-) => {
-  const response = await axios.put(`${BASE_URL}/${uuid}`, data, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+// ─── UPDATE CUSTOMER ───────────────────────
+export const updateCustomerAPI = async (
+  id: number,
+  formData: Partial<CustomerRecord> & {
+    phone?: string;
+    email?: string;
+    dateOfBirth?: string;
+  },
+): Promise<CustomerRecord> => {
+  try {
+    const payload = mapFormToBackend(formData);
 
-  return response.data.data;
-};
+    const { data: res } = await axiosInstance.put(
+      `/newcustomer/${id}`,
+      payload,
+    );
 
-export const deleteCustomerApi = async (uuid: string) => {
-  const response = await axios.delete(`${BASE_URL}/${uuid}`);
-  return response.data;
+    if (res?.data?.customer) return res.data.customer;
+    if (res?.data) return res.data;
+
+    // fallback (backend null bhej raha ho)
+    return { ...payload, id, customerPhone: payload.customerPhone! };
+  } catch (error: any) {
+    console.error(
+      "Error updating customer:",
+      error.response?.data || error.message,
+    );
+    throw new Error(error.response?.data?.message || "Error updating customer");
+  }
 };

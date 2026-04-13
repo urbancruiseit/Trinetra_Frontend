@@ -9,7 +9,6 @@ import { Admin } from "../components/admin";
 import { Access } from "../components/Access/accesslevel";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { useSearchParams } from "next/navigation";
 import { currentUserThunk } from "../features/user/userSlice";
 import type { LeadRecord } from "@/types/types";
 
@@ -59,7 +58,8 @@ type DashboardView =
   | "citymanager-dashboard"
   | "bdm-dashboard"
   | "teamleader-dashboard"
-  | "salesteam-dashboard";
+  | "salesteam-dashboard"
+  | "telesales-dashboard"; // Added missing type
 
 interface MasterTab {
   key: MasterKey;
@@ -80,6 +80,7 @@ const LeadsOverviewModule = dynamic(
     loading: LoadingPanel,
   },
 );
+
 const PresalesDashboardModule = dynamic(
   () => import("../components/presalesteam/dashboardpresales"),
   {
@@ -87,8 +88,6 @@ const PresalesDashboardModule = dynamic(
     loading: LoadingPanel,
   },
 );
-
-
 
 const BdmDashboardModule = dynamic(
   () => import("../components/bdmdash/bdmtemadash"),
@@ -98,10 +97,7 @@ const BdmDashboardModule = dynamic(
   },
 );
 
-
-
 const masterTabs: MasterTab[] = [
- 
   {
     key: "city",
     label: "City Master",
@@ -110,7 +106,6 @@ const masterTabs: MasterTab[] = [
       loading: LoadingPanel,
     }),
   },
-  
   {
     key: "zone",
     label: "Zone",
@@ -133,6 +128,8 @@ export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState<SidebarSection>("leads");
   const [activeMaster, setActiveMaster] = useState<MasterKey>("vendor");
   const [activeLeadView, setActiveLeadView] = useState<LeadView>("dashboard");
+  const [userSubDepartment, setUserSubDepartment] = useState<string>(""); // Added missing state
+  const [userDepartment, setUserDepartment] = useState<string>(""); // Added missing state
 
   const getDefaultDashboard = (role: string): DashboardView => {
     const normalizedRole = role.toLowerCase().trim();
@@ -176,7 +173,6 @@ export default function DashboardPage() {
   const [showRules, setRulesReports] = useState<boolean>(false);
   const [showLostRule, setLostLeadReports] = useState<boolean>(false);
   const [showUnwanted, setshowUnwanted] = useState<boolean>(false);
-
   const [showAnulDestReports, setShowAnulDestReports] =
     useState<boolean>(false);
   const [userRole, setUserRole] = useState<string>("");
@@ -212,34 +208,50 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (currentUser) {
-      const role = currentUser.role || "user";
+      const userAny = currentUser as any;
+
+      const role = userAny.role || userAny.role_name || "user";
+      const subDepartment_name =
+        userAny.subDepartment_name ||
+        userAny.subdepartname_name ||
+        userAny.department ||
+        "";
+      const departmentName =
+        userAny.department_name || userAny.departmentname || "";
+
       setUserRole(role);
       setUserName(currentUser.name || "User");
       setUserEmail(currentUser.email || "");
+      setUserSubDepartment(subDepartment_name);
+      setUserDepartment(departmentName);
 
-      // Set the default dashboard view based on role
-      const defaultDashboard = getDefaultDashboard(role);
-      setActiveDashboardView(defaultDashboard);
+      const isTelesales = subDepartment_name?.toLowerCase() === "tele-sales";
+      const isPresales = subDepartment_name?.toLowerCase() === "pre-sales";
+      const isTeamLeaderSales =
+        isTelesales && role?.toLowerCase().includes("team leader");
+      const isCityManager =
+        isTelesales && role?.toLowerCase().includes("city manager");
 
-      // If Sales or Presales role (case insensitive), also set the active section to dashboard
-      const lowerRole = role.toLowerCase().trim();
-      if (
-        lowerRole === "sales" ||
-        lowerRole === "presale" ||
-        lowerRole === "presales" ||
-        lowerRole === "team leader" ||
-        lowerRole === "teamleader" ||
-        lowerRole === "team_leader" ||
-        lowerRole === "bdm" ||
-        lowerRole === "city manager" ||
-        lowerRole === "citymanager"
-      ) {
+      if (isTeamLeaderSales) {
         setActiveSection("dashboard");
-        // Ensure presales users always get presales-dashboard view
-        if (lowerRole === "presale" || lowerRole === "presales") {
-          setActiveDashboardView("presales-dashboard");
-        }
+        setActiveDashboardView("teamleader-dashboard");
+      } else if (isCityManager) {
+        setActiveSection("dashboard");
+        setActiveDashboardView("citymanager-dashboard");
+      } else if (isTelesales) {
+        setActiveSection("dashboard");
+        setActiveDashboardView("telesales-dashboard");
+      } else if (isPresales) {
+        setActiveSection("dashboard");
+        setActiveDashboardView("presales-dashboard");
+      } else {
+        setActiveSection("leads");
+        setActiveLeadView("dashboard");
+        setActiveDashboardView("leads-dashboard");
       }
+
+      setPendingModuleKey(null);
+      resetAllReportStates();
     }
   }, [currentUser]);
 
@@ -413,6 +425,7 @@ export default function DashboardPage() {
     setActiveSection("leads");
     setActiveLeadView("dashboard");
   };
+
   const handleUnwantedLeads = () => {
     resetAllReportStates();
     setshowUnwanted(true);
@@ -420,7 +433,7 @@ export default function DashboardPage() {
     setActiveLeadView("dashboard");
   };
 
-  // 🔥 Handler for Sales Lead Table
+  // Handler for Sales Lead Table
   const handleSalesLeadSelect = (key: string) => {
     if (key === "sales-lead-table" || key === "sale-lead-table") {
       setPendingModuleKey(null);
@@ -430,7 +443,7 @@ export default function DashboardPage() {
     }
   };
 
-  // 🔥 Handler for TL Tables
+  // Handler for TL Tables
   const handleTlTablesSelect = (key: string) => {
     if (key === "tl-tables") {
       setPendingModuleKey(null);
@@ -491,10 +504,7 @@ export default function DashboardPage() {
       if (showTransferLeads) {
         const TransferLeadsModule = dynamic(
           () => import("../components/pages/leads/Reports/transferleads"),
-          {
-            ssr: false,
-            loading: LoadingPanel,
-          },
+          { ssr: false, loading: LoadingPanel },
         );
         return (
           <div className="space-y-6">
@@ -502,13 +512,11 @@ export default function DashboardPage() {
           </div>
         );
       }
+
       if (showSwapLeads) {
         const SwapLeadsModule = dynamic(
           () => import("../components/pages/teamleader/swapleads"),
-          {
-            ssr: false,
-            loading: LoadingPanel,
-          },
+          { ssr: false, loading: LoadingPanel },
         );
         return (
           <div className="space-y-6">
@@ -516,17 +524,15 @@ export default function DashboardPage() {
           </div>
         );
       }
+
       if (showEnquiryTime) {
-        const SwapLeadsModule = dynamic(
+        const TimeEnquiryModule = dynamic(
           () => import("../components/pages/leads/Reports/timenuiry"),
-          {
-            ssr: false,
-            loading: LoadingPanel,
-          },
+          { ssr: false, loading: LoadingPanel },
         );
         return (
           <div className="space-y-6">
-            <SwapLeadsModule />
+            <TimeEnquiryModule />
           </div>
         );
       }
@@ -545,6 +551,7 @@ export default function DashboardPage() {
           </div>
         );
       }
+
       if (showMeReports) {
         const MeReportsModule = dynamic(
           () => import("../components/pages/leads/Reports/mereport"),
@@ -665,6 +672,7 @@ export default function DashboardPage() {
           </div>
         );
       }
+
       if (showUnwanted) {
         const UnwantedLeadsModule = dynamic(
           () =>
@@ -681,6 +689,7 @@ export default function DashboardPage() {
         );
       }
 
+      // Default leads view
       return (
         <div className="space-y-6">
           <LeadsOverviewModule />
@@ -748,7 +757,6 @@ export default function DashboardPage() {
     <div className="flex flex-col h-screen overflow-hidden bg-slate-100 text-slate-900">
       {/* Navbar - Full Width */}
       <Navbar
-        // 🔥 Added showSalesMenu prop
         showSalesMenu={true}
         showAccess={activeSection === "access"}
         showMaster={activeSection === "master"}
@@ -780,7 +788,6 @@ export default function DashboardPage() {
         onshortcuttable={handleShortcut}
         onrules={handleRules}
         onpresales={handleUnwantedLeads}
-        // 🔥 Added onSalesLeadSelect prop
         onSalesLeadSelect={handleSalesLeadSelect}
         onSalesEditFormSelect={handleSalesEditFormSelect}
         onTlTablesSelect={handleTlTablesSelect}
@@ -799,7 +806,7 @@ export default function DashboardPage() {
           if (key === "lead-form" || key === "lead-table") {
             setPendingModuleKey(null);
             setActiveSection("leads");
-            setActiveLeadView(key);
+            setActiveLeadView(key as LeadView);
             resetAllReportStates();
           } else if (key === "sale-lead-table") {
             handleSalesLeadSelect(key);

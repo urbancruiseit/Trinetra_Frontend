@@ -9,7 +9,7 @@ import { AppDispatch } from "../redux/store";
 import Image from "next/image";
 import { clsx } from "clsx"; // or your preferred cn utility
 
-import trinetraLogo from "@/app/assets/trinetra.png";
+import pinaakLogo from "@/app/assets/pinnak.png";
 import urbanlogo from "@/app/assets/urbanlogo.png";
 
 import {
@@ -65,12 +65,8 @@ export function Login() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-700" />
       </div>
 
-      <div className="w-full max-w-7xl relative z-10 mt-8">
-        {" "}
-        {/* Added mt-8 for top margin */}
-        <div className="relative w-full min-h-[55vh] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl flex">
-          {" "}
-          {/* Changed from 70vh to 55vh */}
+      <div className="w-full max-w-7xl relative z-10">
+        <div className="relative w-full min-h-[75vh] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl flex">
           {/* LEFT SECTION */}
           <section className="w-1/2 bg-gradient-to-br from-green-600 via-green-500 to-emerald-500 text-white flex flex-col justify-between relative overflow-hidden p-12 rounded-l-3xl">
             <div className="absolute inset-0 opacity-10">
@@ -104,9 +100,7 @@ export function Login() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-emerald-300 rounded-full mix-blend-overlay filter blur-xl animate-blob animation-delay-4000" />
             </div>
 
-            <div className="relative z-10 flex flex-col h-full gap-6">
-              {" "}
-              {/* Reduced gap from 8 to 6 */}
+            <div className="relative z-10 flex flex-col h-full gap-8">
               <div className="flex-1 flex items-center justify-center">
                 <div className="relative group">
                   <div className="absolute inset-0 bg-white/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500" />
@@ -115,22 +109,21 @@ export function Login() {
                     style={{ aspectRatio: "4/3" }}
                   >
                     <Image
-                      src={trinetraLogo}
-                      alt="Trinetra Logo"
+                      src={pinaakLogo}
+                      alt="Pinaak Logo"
                       className="w-full h-full object-contain p-6 drop-shadow-2xl"
                     />
                   </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                {" "}
-                {/* Reduced space from 6 to 4 */}
+
+              <div className="space-y-6">
                 <div className="text-center flex flex-col items-center gap-2">
                   {/* First Container */}
                   <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
                     <Sparkles size={16} />
                     <p className="text-white text-md font-medium">
-                      Trinetra Analytics System
+                      Sales and Operational System
                     </p>
                   </div>
 
@@ -141,14 +134,15 @@ export function Login() {
                     </p>
                   </div>
                 </div>
+
                 <div className="flex flex-wrap gap-2 justify-center">
                   {[
                     "Leads",
-                    " Employee Report",
-                    "Unwanted Leads",
-                    "Monthly Reports",
-                    "Yearly Reports",
-                    "Timely Reports",
+                    "Booking",
+                    "Trip",
+                    "Feedback",
+                    "Vendors",
+                    "Drivers",
                   ].map((tag, index) => (
                     <span
                       key={tag}
@@ -159,11 +153,10 @@ export function Login() {
                     </span>
                   ))}
                 </div>
-                <div className="text-center pt-4">
-                  {" "}
-                  {/* Reduced padding from 8 to 4 */}
+
+                <div className="text-center pt-8">
                   <p className="text-sm text-white font-light tracking-wide">
-                    © 2026 Trinetra. All rights reserved.
+                    © 2026 PINAAK. All rights reserved.
                   </p>
                   <p className="text-sm text-white mt-1">
                     Powered by{" "}
@@ -173,74 +166,56 @@ export function Login() {
               </div>
             </div>
           </section>
+
           {/* RIGHT SECTION */}
           <section className="w-1/2 flex items-center justify-center bg-white rounded-r-3xl relative overflow-visible">
-            <div className="w-full max-w-md space-y-3 pt-32">
-              {" "}
-              {/* Reduced padding from 48 to 32 */}
+            <div className="w-full max-w-md space-y-3 pt-48">
               <div className="flex justify-center items-center">
-                <div className="absolute top-12 left-2/4 -translate-x-2/4 -translate-y-2/4 w-full max-w-md">
-                  {" "}
-                  {/* Changed from top-16 to top-12 */}
-                  <div className="bg-white rounded-2xl border border-gray-100 shadow-[0px_0px_25px_10px_rgba(0,0,0,0.1)] p-4">
-                    {" "}
-                    {/* Reduced padding from 5 to 4 */}
+                <div className="absolute top-16 left-2/4 -translate-x-2/4 -translate-y-2/4 w-full max-w-md">
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-[0px_0px_25px_10px_rgba(0,0,0,0.1)] p-5">
                     <Image
                       src={urbanlogo}
                       alt="Urban Cruise"
-                      className="h-52 w-full object-contain drop-shadow-xl" // Reduced from 64 to 52
+                      className="h-64 w-full object-contain drop-shadow-xl"
                     />
                   </div>
                 </div>
               </div>
-              <div className="space-y-1">
-                {" "}
-                {/* Reduced space from 2 to 1 */}
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
-                  {" "}
-                  {/* Reduced from 4xl to 3xl */}
-                  Welcome to Trinetra
+
+              <div className="space-y-2">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                  Welcome to Pinaak
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
-                  {" "}
-                  {/* Reduced from base to sm */}
+                <p className="text-gray-600 dark:text-gray-400 text-base flex items-center gap-2">
                   <span>Sign in to your workspace</span>
                   <ArrowRight
-                    size={14} // Reduced from 16 to 14
+                    size={16}
                     className="text-green-600 animate-bounce-x"
                   />
                 </p>
               </div>
+
               {/* ✅ Fixed: serverError instead of error */}
               {serverError && (
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-xl blur-xl transition-all group-hover:blur-2xl" />
-                  <div className="relative flex items-center gap-3 rounded-xl px-4 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-red-200 dark:border-red-900/50 shadow-lg">
-                    {" "}
-                    {/* Reduced padding from 3 to 2 */}
+                  <div className="relative flex items-center gap-3 rounded-xl px-4 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-red-200 dark:border-red-900/50 shadow-lg">
                     <AlertCircle
-                      size={16} // Reduced from 18 to 16
+                      size={18}
                       className="text-red-500 flex-shrink-0"
                     />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
-                      {" "}
-                      {/* Reduced from sm to xs */}
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
                       {serverError}
                     </p>
                   </div>
                 </div>
               )}
+
               {/* ✅ Fixed: handleSubmit(onSubmit) */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {" "}
-                {/* Reduced space from 6 to 4 */}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Email */}
-                <div className="space-y-1">
-                  {" "}
-                  {/* Reduced space from 2 to 1 */}
-                  <label className="text-sm font-semibold text-black ml-1">
-                    {" "}
-                    {/* Reduced from md to sm */}
+                <div className="space-y-2">
+                  <label className="text-md font-semibold text-black  ml-1">
                     Email
                   </label>
                   <div className="relative group">
@@ -254,7 +229,7 @@ export function Login() {
                     />
                     <div className="relative flex items-center">
                       <User
-                        size={16} // Reduced from 18 to 16
+                        size={18}
                         className={cn(
                           "absolute left-4 transition-all duration-300",
                           focusedField === "email"
@@ -266,12 +241,12 @@ export function Login() {
                         type="email"
                         {...register("email", {
                           required: "Email is required",
-                        })}
+                        })} // ✅ react-hook-form register
                         onFocus={() => setFocusedField("email")}
                         onBlur={() => setFocusedField(null)}
                         placeholder="Enter your email"
                         disabled={isSubmitting}
-                        className="w-full pl-11 pr-4 h-10 rounded-xl border bg-white text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm" // Reduced height from 12 to 10
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border  bg-white  text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                     {errors.email && (
@@ -281,13 +256,10 @@ export function Login() {
                     )}
                   </div>
                 </div>
+
                 {/* Password */}
-                <div className="space-y-1">
-                  {" "}
-                  {/* Reduced space from 2 to 1 */}
-                  <label className="text-sm font-semibold text-black ml-1">
-                    {" "}
-                    {/* Reduced from md to sm */}
+                <div className="space-y-2">
+                  <label className="text-md font-semibold text-black  ml-1">
                     Password
                   </label>
                   <div className="relative group">
@@ -301,7 +273,7 @@ export function Login() {
                     />
                     <div className="relative flex items-center">
                       <Lock
-                        size={16} // Reduced from 18 to 16
+                        size={18}
                         className={cn(
                           "absolute left-4 transition-all duration-300",
                           focusedField === "password"
@@ -313,12 +285,12 @@ export function Login() {
                         type={showPw ? "text" : "password"}
                         {...register("password", {
                           required: "Password is required",
-                        })}
+                        })} // ✅ react-hook-form register
                         onFocus={() => setFocusedField("password")}
                         onBlur={() => setFocusedField(null)}
                         placeholder="••••••••"
                         disabled={isSubmitting}
-                        className="w-full pl-11 pr-4 h-10 rounded-xl border bg-white text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm" // Reduced height from 12 to 10
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border  bg-white  text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                       <button
                         type="button"
@@ -326,8 +298,7 @@ export function Login() {
                         disabled={isSubmitting}
                         className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {showPw ? <EyeOff size={16} /> : <Eye size={16} />}{" "}
-                        {/* Reduced from 18 to 16 */}
+                        {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                     {errors.password && (
@@ -337,35 +308,32 @@ export function Login() {
                     )}
                   </div>
                 </div>
+
                 <div className="flex items-center justify-center">
-                  <p className="text-xs text-green-600 font-medium">
-                    {" "}
-                    {/* Reduced from sm to xs */}
+                  <p className="text-sm text-green-600 font-medium">
                     Please contact HR to reset your password.
                   </p>
                 </div>
+
                 {/* ✅ Fixed: isSubmitting instead of loading */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="relative w-full group"
                 >
-                  <div className="relative h-10 rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold text-sm overflow-hidden">
-                    {" "}
-                    {/* Reduced height from 12 to 10 */}
+                  <div className="relative h-12 rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold text-sm overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     <span className="relative flex items-center justify-center gap-2 h-full">
                       {isSubmitting ? (
                         <>
-                          <Loader2 size={16} className="animate-spin" />{" "}
-                          {/* Reduced from 18 to 16 */}
+                          <Loader2 size={18} className="animate-spin" />
                           <span>Signing in...</span>
                         </>
                       ) : (
                         <>
                           <span>Sign In</span>
                           <ArrowRight
-                            size={14} // Reduced from 16 to 14
+                            size={16}
                             className="group-hover:translate-x-1 transition-transform"
                           />
                         </>

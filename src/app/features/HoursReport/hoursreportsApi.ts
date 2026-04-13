@@ -1,5 +1,4 @@
-import { baseApi } from "@/uitils/commonApi";
-import axios from "axios";
+import axiosInstance from "@/uitils/axiosInstance";
 
 export interface MonthlyHourReportRecord {
   month: number;
@@ -8,22 +7,24 @@ export interface MonthlyHourReportRecord {
   total: number;
 }
 
-const hoursReportApi = `${baseApi}/hoursreport`;
-
+// ─── GET MONTHLY HOUR REPORT ─────────────────
 export const getMonthlyReportApi = async (
   year: number,
 ): Promise<MonthlyHourReportRecord[]> => {
   try {
-    const response = await axios.get<{ data: MonthlyHourReportRecord[] }>(
-      hoursReportApi,
-      {
-        params: { year },
-      },
+    const { data: res } = await axiosInstance.get<{
+      data: MonthlyHourReportRecord[];
+    }>("/hoursreport", {
+      params: { year },
+    });
+
+    return res.data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching monthly hour report:",
+      error.response?.data || error.message,
     );
 
-    return response.data.data;
-  } catch (error: any) {
-    console.error("Error fetching monthly hour report:", error);
     throw error?.response?.data || error.message || "Something went wrong";
   }
 };

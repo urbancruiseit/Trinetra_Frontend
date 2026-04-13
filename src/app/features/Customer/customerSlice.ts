@@ -1,218 +1,207 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CustomerRecord } from "@/types/types";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import {
-  createCustomerApi,
-  getAllCustomersApi,
-  getCustomerByIdApi,
-  updateCustomerApi,
-  deleteCustomerApi,
+  fetchCustomersAPI,
+  searchCustomersAPI,
+  createCustomerAPI,
+  updateCustomerAPI,
+  CustomerRecord,
 } from "./customerApi";
 
-interface CustomerWithUUID extends CustomerRecord {
-  uuid: string;
-}
-
 interface CustomerState {
-  customers: CustomerWithUUID[];
-  customer: CustomerWithUUID | null;
+  customers: CustomerRecord[];
+  searchResults: CustomerRecord[];
   loading: boolean;
+  searching: boolean;
   error: string | null;
+  searchError: string | null;
+  createdCustomer: CustomerRecord | null;
+  isSuccess: boolean;
 }
 
 const initialState: CustomerState = {
   customers: [],
-  customer: null,
+  searchResults: [],
   loading: false,
+  searching: false,
   error: null,
+  searchError: null,
+  createdCustomer: null,
+  isSuccess: false,
 };
 
-export const createCustomerThunk = createAsyncThunk<
-  CustomerWithUUID,
-  CustomerRecord,
-  { rejectValue: string }
->("customer/create", async (data, { rejectWithValue }) => {
-  try {
-    return (await createCustomerApi(data)) as CustomerWithUUID;
-  } catch (error: any) {
-    return rejectWithValue(error?.message || "Failed to create customer");
-  }
-});
+// ─── Get All Customers ──────────────────────────────────────────────────────
+export const getCustomersThunk = createAsyncThunk(
+  "newCustomer/getCustomers",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await fetchCustomersAPI();
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Error fetching customers");
+    }
+  },
+);
 
-export const getCustomersThunk = createAsyncThunk<
-  CustomerWithUUID[],
-  void,
-  { rejectValue: string }
->("customer/getAll", async (_, { rejectWithValue }) => {
-  try {
-    return (await getAllCustomersApi()) as CustomerWithUUID[];
-  } catch (error: any) {
-    return rejectWithValue(error?.message || "Failed to fetch customers");
-  }
-});
+// ─── Search Customers ───────────────────────────────────────────────────────
+export const searchCustomersThunk = createAsyncThunk(
+  "newCustomer/searchCustomers",
+  async (searchTerm: string, { rejectWithValue }) => {
+    try {
+      if (!searchTerm.trim()) return [];
+      return await searchCustomersAPI(searchTerm);
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Error searching customers");
+    }
+  },
+);
 
-export const getCustomerByIdThunk = createAsyncThunk<
-  CustomerWithUUID,
-  string,
-  { rejectValue: string }
->("customer/getById", async (uuid, { rejectWithValue }) => {
-  try {
-    return (await getCustomerByIdApi(uuid)) as CustomerWithUUID;
-  } catch (error: any) {
-    return rejectWithValue(error?.message || "Failed to fetch customer");
-  }
-});
+// ─── Create Customer ────────────────────────────────────────────────────────
+export const createCustomerThunk = createAsyncThunk(
+  "newCustomer/createCustomer",
+  async (
+    customerData: Partial<CustomerRecord> & { phone?: string; email?: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await createCustomerAPI(customerData);
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Error creating customer");
+    }
+  },
+);
 
-export const updateCustomerThunk = createAsyncThunk<
-  CustomerWithUUID,
-  { uuid: string; data: CustomerRecord },
-  { rejectValue: string }
->("customer/update", async ({ uuid, data }, { rejectWithValue }) => {
-  try {
-    return (await updateCustomerApi(uuid, data)) as CustomerWithUUID;
-  } catch (error: any) {
-    return rejectWithValue(error?.message || "Failed to update customer");
-  }
-});
+// ─── Update Customer ────────────────────────────────────────────────────────
+// CustomerForm dispatch karta hai: { id: editCustomerId, data: formData }
+// formData mein: phone, email, dateOfBirth (form ke field names)
+// updateCustomerAPI ke andar mapping hoti hai backend ke names pe
+export const updateCustomerThunk = createAsyncThunk(
+  "newCustomer/updateCustomer",
+  async (
+    {
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<CustomerRecord> & {
+        phone?: string;
+        email?: string;
+        dateOfBirth?: string;
+      };
+    },
+    { rejectWithValue },
+  ) => {
+    try {
+      const result = await updateCustomerAPI(id, data);
+      return result;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Error updating customer");
+    }
+  },
+);
 
-export const deleteCustomerThunk = createAsyncThunk<
-  string,
-  string,
-  { rejectValue: string }
->("customer/delete", async (uuid, { rejectWithValue }) => {
-  try {
-    await deleteCustomerApi(uuid);
-    return uuid;
-  } catch (error: any) {
-    return rejectWithValue(error?.message || "Failed to delete customer");
-  }
-});
-
-const customerSlice = createSlice({
-  name: "customer",
+// ─── Slice ──────────────────────────────────────────────────────────────────
+const NewCustomerSlice = createSlice({
+  name: "newCustomer",
   initialState,
   reducers: {
-    clearCustomerState: (state) => {
+    clearError: (state) => {
       state.error = null;
-      state.customer = null;
+      state.searchError = null;
     },
-    clearSelectedCustomer: (state) => {
-      state.customer = null;
+    clearSearchResults: (state) => {
+      state.searchResults = [];
+      state.searching = false;
+      state.searchError = null;
+    },
+    resetSuccess: (state) => {
+      state.isSuccess = false;
+      state.createdCustomer = null;
     },
   },
   extraReducers: (builder) => {
+    // ── Get All ──────────────────────────────────────────────────────────────
     builder
-
-      // Create Customer
-      .addCase(createCustomerThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        createCustomerThunk.fulfilled,
-        (state, action: PayloadAction<CustomerWithUUID>) => {
-          state.loading = false;
-          state.customer = action.payload;
-
-          const exists = state.customers.some(
-            (c) => c.uuid === action.payload.uuid
-          );
-
-          if (!exists) {
-            state.customers.unshift(action.payload);
-          }
-        }
-      )
-      .addCase(createCustomerThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to create customer";
-      })
-
-      // Get All Customers
       .addCase(getCustomersThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(
         getCustomersThunk.fulfilled,
-        (state, action: PayloadAction<CustomerWithUUID[]>) => {
+        (state, action: PayloadAction<CustomerRecord[]>) => {
           state.loading = false;
           state.customers = action.payload;
-        }
+        },
       )
       .addCase(getCustomersThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch customers";
+        state.error = action.payload as string;
       })
 
-      // Get Customer By Id
-      .addCase(getCustomerByIdThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      // ── Search ───────────────────────────────────────────────────────────────
+      .addCase(searchCustomersThunk.pending, (state) => {
+        state.searching = true;
+        state.searchError = null;
       })
       .addCase(
-        getCustomerByIdThunk.fulfilled,
-        (state, action: PayloadAction<CustomerWithUUID>) => {
-          state.loading = false;
-          state.customer = action.payload;
-        }
+        searchCustomersThunk.fulfilled,
+        (state, action: PayloadAction<CustomerRecord[]>) => {
+          state.searching = false;
+          state.searchResults = action.payload;
+        },
       )
-      .addCase(getCustomerByIdThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to fetch customer";
+      .addCase(searchCustomersThunk.rejected, (state, action) => {
+        state.searching = false;
+        state.searchError = action.payload as string;
       })
 
-      // Update Customer
+      // ── Create ───────────────────────────────────────────────────────────────
+      .addCase(createCustomerThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.isSuccess = false;
+      })
+      .addCase(
+        createCustomerThunk.fulfilled,
+        (state, action: PayloadAction<CustomerRecord>) => {
+          state.loading = false;
+          state.createdCustomer = action.payload;
+          state.customers.unshift(action.payload);
+          state.isSuccess = true;
+        },
+      )
+      .addCase(createCustomerThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.isSuccess = false;
+      })
+
+      // ── Update ───────────────────────────────────────────────────────────────
       .addCase(updateCustomerThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.isSuccess = false;
       })
       .addCase(
         updateCustomerThunk.fulfilled,
-        (state, action: PayloadAction<CustomerWithUUID>) => {
+        (state, action: PayloadAction<CustomerRecord>) => {
           state.loading = false;
-          state.customer = action.payload;
-
+          // Local list mein bhi update karo taaki table refresh na karna pade
           const index = state.customers.findIndex(
-            (c) => c.uuid === action.payload.uuid
+            (c) => c.id === action.payload.id,
           );
-
           if (index !== -1) {
             state.customers[index] = action.payload;
           }
-        }
+          state.isSuccess = true;
+        },
       )
       .addCase(updateCustomerThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to update customer";
-      })
-
-      // Delete Customer
-      .addCase(deleteCustomerThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        deleteCustomerThunk.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-
-          state.customers = state.customers.filter(
-            (c) => c.uuid !== action.payload
-          );
-
-          if (state.customer?.uuid === action.payload) {
-            state.customer = null;
-          }
-        }
-      )
-      .addCase(deleteCustomerThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to delete customer";
+        state.error = action.payload as string;
+        state.isSuccess = false;
       });
   },
 });
 
-export const { clearCustomerState, clearSelectedCustomer } =
-  customerSlice.actions;
-
-export default customerSlice.reducer;
+export const { clearError, clearSearchResults, resetSuccess } =
+  NewCustomerSlice.actions;
+export default NewCustomerSlice.reducer;

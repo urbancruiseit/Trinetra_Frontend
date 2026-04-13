@@ -52,6 +52,11 @@ export interface FilterOptions {
 }
 
 export interface LeadRecord {
+  leadId: string;
+    fullName?: string;
+    firstName?: string;
+    lastName?: string;
+ middleName?: string;
   aged: any;
   liveorexpiry: any;
   vehicle2: any;
@@ -103,7 +108,7 @@ export interface LeadRecord {
   dropAddress?: string;
   itinerary?: string[];
   vehicles?: string;
-  alternatePhone?: string;   
+  alternatePhone?: string;
   vehiclevehicle2?: string;
   vehiclevehicle3?: string;
   passengerTotal: number;
@@ -116,17 +121,19 @@ export interface LeadRecord {
   largeBaggage?: number;
   airportBaggage?: number;
   totalBaggage?: number;
-  remarks?: string;   
+  remarks?: string;
   message?: string;
   lost_reason?: string;
   totalPages: Number;
   countryName?: string;
   lostReasonDetails?: string;
   followUp?: string;
-  customerCity?:string;
-  vehicle3Quantity?:string;
-   vehicle2Quantity?:string;
-    vehicle1Quantity?:string;
+  customerCity?: string;
+  vehicle3Quantity?: string;
+  vehicle2Quantity?: string;
+  vehicle1Quantity?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 export type UserRole =
   | "user"
@@ -179,8 +186,6 @@ export interface State {
   id: number;
   stateName: string;
 }
-
-
 
 export interface CustomerRecord {
   // Personal Info

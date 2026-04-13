@@ -225,38 +225,50 @@ export default function MonthlyEnquiryReport() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
-      <div className="flex flex-wrap justify-between items-center mb-4 bg-white shadow-md p-4 rounded-lg gap-3">
-        <h2 className="text-3xl font-bold text-green-700">
-          MONTHLY ENQUIRY REPORT – LEAD TRENDS
-        </h2>
-        <div className="flex gap-3 flex-wrap">
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="border px-3 py-2 font-semibold"
-          >
-            {months.map((m) => (
-              <option key={m.name}>{m.name}</option>
-            ))}
-          </select>
-          <select
-            value={compareMonth}
-            onChange={(e) => setCompareMonth(e.target.value)}
-            className="border px-3 py-2 font-semibold bg-yellow-100"
-          >
-            {months.map((m) => (
-              <option key={m.name}>{m.name}</option>
-            ))}
-          </select>
-          <select
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="border px-3 py-2 font-semibold"
-          >
-            {["2024", "2025", "2026", "2027"].map((y) => (
-              <option key={y}>{y}</option>
-            ))}
-          </select>
+
+      <div className="mb-4 bg-orange-100 shadow-lg rounded-md flex justify-between items-center">
+        <div className="sticky top-0 z-10 bg-orange-100 p-3 rounded-md w-full">
+          <div className="flex items-center">
+            {/* LEFT TITLE */}
+            <div className="pl-4 border-l-8 border-orange-500 bg-white px-3 rounded-md shadow-md">
+              <h2 className="text-4xl font-bold text-left py-4 text-orange-600 p-2">
+                Time Enquiry Reports – LEAD TRENDS
+              </h2>
+            </div>
+
+            {/* RIGHT FILTERS */}
+            <div className="flex gap-3 flex-wrap ml-auto">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="border px-3 py-2 font-semibold"
+              >
+                {months.map((m) => (
+                  <option key={m.name}>{m.name}</option>
+                ))}
+              </select>
+
+              <select
+                value={compareMonth}
+                onChange={(e) => setCompareMonth(e.target.value)}
+                className="border px-3 py-2 font-semibold bg-yellow-100"
+              >
+                {months.map((m) => (
+                  <option key={m.name}>{m.name}</option>
+                ))}
+              </select>
+
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="border px-3 py-2 font-semibold"
+              >
+                {["2024", "2025", "2026", "2027"].map((y) => (
+                  <option key={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -264,16 +276,16 @@ export default function MonthlyEnquiryReport() {
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg border">
         <table className="border-collapse w-full text-center font-semibold">
           <thead>
-            <tr className="bg-green-700 text-white">
+            <tr className="bg-blue-950 text-white">
               <th className="border p-2">TIME SLOT</th>
               {[...Array(monthInfo.days)].map((_, i) => (
                 <th key={i} className="border p-1">
                   {i + 1}
                 </th>
               ))}
-              <th className="border bg-yellow-400 text-black">TOTAL</th>
-              <th className="border bg-yellow-400 text-black">AVG</th>
-              <th className="border bg-yellow-400 text-black">%</th>
+              <th className="border bg-blue-950 text-white">TOTAL</th>
+              <th className="border bg-blue-950 text-white">AVG</th>
+              <th className="border bg-blue-950 text-white">%</th>
             </tr>
           </thead>
 
@@ -288,16 +300,20 @@ export default function MonthlyEnquiryReport() {
                     {v} {/* show zero values */}
                   </td>
                 ))}
-                <td className="border bg-yellow-300 font-bold">{slot.total}</td>
-                <td className="border bg-yellow-300 font-bold">{slot.avg}</td>
-                <td className="border bg-green-300 font-bold">
+                <td className="border border-white bg-amber-200 font-bold">
+                  {slot.total}
+                </td>
+                <td className="border border-white bg-amber-200 font-bold">
+                  {slot.avg}
+                </td>
+                <td className="border border-white bg-amber-200 font-bold">
                   {getPercent(slot.total)}%
                 </td>
               </tr>
             ))}
 
             {/* Total row */}
-            <tr className="bg-blue-900 text-white font-bold">
+            <tr className="bg-blue-950 text-white font-bold">
               <td className="border p-2">TOTAL</td>
               {dailyTotals.map((v, i) => (
                 <td key={i} className="border p-1">

@@ -190,19 +190,19 @@ export default function DestinationAnalysisTable() {
               {months.map((_, i) => (
                 <th
                   key={i}
-                  className="border p-1 bg-blue-900 text-white font-semibold "
+                  className="border p-1 bg-blue-950 text-white font-semibold "
                 >
                   {months[i]}
                 </th>
               ))}
               {/* Summary columns */}
-              <th className="border  bg-yellow-900 text-white font-bold text-center">
+              <th className="border  bg-yellow-950 text-white font-bold text-center">
                 TOTAL
               </th>
-              <th className="border  bg-yellow-900 text-white font-bold text-center">
+              <th className="border  bg-yellow-950 text-white font-bold text-center">
                 AVG
               </th>
-              <th className="border  bg-yellow-900 text-white font-bold text-lg text-center">
+              <th className="border  bg-yellow-950 text-white font-bold text-lg text-center">
                 %
               </th>
             </tr>

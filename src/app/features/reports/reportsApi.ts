@@ -1,8 +1,5 @@
-import axios from "axios";
-import { baseApi } from "../../../uitils/commonApi";
-
-// ✅ reportsRouter "/reports" use kar raha hai
-const reportApi = `${baseApi}/reports`; // becomes: http://localhost:5000/api/v1/reports
+import axiosInstance from "@/uitils/axiosInstance";
+import { baseApi } from "@/uitils/commonApi";
 
 export interface MonthlyReportRecord {
   month: number;
@@ -16,29 +13,25 @@ interface ApiResponse<T> {
   year?: number;
 }
 
+// ─── GET MONTHLY REPORT ─────────────────────
 export const getMonthlyReportApi = async (
   year: number,
 ): Promise<MonthlyReportRecord[]> => {
   try {
-    console.log("🌐 Full URL:", `${reportApi}/monthly-enquiry?year=${year}`);
+    console.log("🌐 URL:", `/reports/monthly-enquiry?year=${year}`);
 
-    const response = await axios.get<ApiResponse<MonthlyReportRecord[]>>(
-      `${reportApi}/monthly-enquiry`,
-      {
-        params: { year },
-        timeout: 10000,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      },
-    );
+    const { data: res, status } = await axiosInstance.get<
+      ApiResponse<MonthlyReportRecord[]>
+    >("/reports/monthly-enquiry", {
+      params: { year },
+      timeout: 10000,
+    });
 
-    console.log("✅ Response Status:", response.status);
-    console.log("✅ Response Data:", response.data);
+    console.log("✅ Response Status:", status);
+    console.log("✅ Response Data:", res);
 
-    if (response.data?.success && Array.isArray(response.data?.data)) {
-      return response.data.data;
+    if (res?.success && Array.isArray(res?.data)) {
+      return res.data;
     }
 
     return [];
@@ -52,33 +45,35 @@ export const getMonthlyReportApi = async (
       url: error.config?.url,
     });
 
-    // Handle specific errors
+    // ⏱️ Timeout
     if (error.code === "ECONNABORTED") {
       throw new Error("Request timeout - Server is taking too long");
     }
 
+    // 🌐 No response (server down / network issue)
     if (!error.response) {
       throw new Error(
         `Cannot connect to server at ${baseApi}. ` +
-          "Please check if backend is running on port 5000",
+          "Please check if backend is running",
       );
     }
 
     throw new Error(
-      error.response.data?.message || `Server error: ${error.response.status}`,
+      error.response?.data?.message ||
+        `Server error: ${error.response?.status}`,
     );
   }
 };
 
-// ✅ Test function to check API connection
+// ─── TEST CONNECTION ────────────────────────
 export const testConnection = async () => {
   try {
-    // Test root endpoint
-    const response = await axios.get(baseApi.replace("/api/v1", "")); // http://localhost:5000/
+    const { data } = await axiosInstance.get("/"); // baseURL hit karega
+
     return {
       success: true,
       message: "Connected to backend",
-      data: response.data,
+      data,
     };
   } catch (error) {
     return { success: false, error };

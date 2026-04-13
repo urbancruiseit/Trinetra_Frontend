@@ -46,24 +46,24 @@ function generateDailyData(monthInfo: { days: number; baseTotal: number }) {
 const getMonthColor = (monthName: string) => {
   // Rose / Cherry Light Red for APR, MAY, JUN
   if (["APR", "MAY", "JUN"].includes(monthName)) {
-    return "bg-rose-200 hover:bg-rose-300";
+    return "bg-rose-50 hover:bg-rose-300";
   }
-  
+
   // Cyan for JUL, AUG, SEP
   if (["JUL", "AUG", "SEP"].includes(monthName)) {
-    return "bg-cyan-200 hover:bg-cyan-300";
+    return "bg-cyan-50 hover:bg-cyan-300";
   }
-  
+
   // Purple Light for OCT, NOV, DEC
   if (["OCT", "NOV", "DEC"].includes(monthName)) {
-    return "bg-purple-200 hover:bg-purple-300";
+    return "bg-purple-50 hover:bg-purple-200";
   }
-  
+
   // Rose / Cherry Light Red for JAN, FEB, MAR
   if (["JAN", "FEB", "MAR"].includes(monthName)) {
-    return "bg-rose-200 hover:bg-rose-300";
+    return "bg-rose-50 hover:bg-rose-200";
   }
-  
+
   return "bg-gray-200"; // Default fallback
 };
 
@@ -108,11 +108,11 @@ export default function MonthlyEnquiryReport() {
           </div>
         </div>
       </div>
-      
-      <div className="overflow-x-auto border border-black rounded-lg">
+
+      <div className="overflow-x-auto border border-gray-500 rounded-lg">
         <table className="border-collapse font-bold w-full">
           <thead>
-            <tr className="bg-indigo-800 text-white">
+            <tr className="bg-blue-950 text-white">
               <th className="border p-2">#</th>
               <th className="border p-2">MONTH</th>
               {[...Array(31)].map((_, i) => (
@@ -120,8 +120,8 @@ export default function MonthlyEnquiryReport() {
                   {i + 1}
                 </th>
               ))}
-              <th className="border p-2 bg-blue-900 text-white">TOTAL</th>
-              <th className="border p-2 bg-blue-900 text-white">AVG</th>
+              <th className="border p-2 bg-blue-950 text-white">TOTAL</th>
+              <th className="border p-2 bg-blue-950 text-white">AVG</th>
             </tr>
           </thead>
 
@@ -129,10 +129,13 @@ export default function MonthlyEnquiryReport() {
             {allMonthsData.map((m, idx) => {
               // 🎨 Get color based on month
               const rowBg = getMonthColor(m.name);
-              const totalBg = "bg-[#ebd42d] border border-black"; // Yellow for total column
+              const totalBg = "bg-amber-200 border border-white"; // Yellow for total column
 
               return (
-                <tr key={idx} className={`text-center transition-colors duration-200`}>
+                <tr
+                  key={idx}
+                  className={`text-center transition-colors duration-200`}
+                >
                   <td className={`border p-2 ${rowBg}`}>{idx + 1}</td>
                   <td className={`border p-2 ${rowBg} font-bold`}>{m.name}</td>
 
@@ -160,7 +163,7 @@ export default function MonthlyEnquiryReport() {
             })}
 
             {/* Grand Total Row */}
-            <tr className="bg-orange-900 text-white text-center">
+            <tr className="bg-blue-950 text-white text-center">
               <td colSpan={2} className="border border-white p-2 font-bold">
                 TOTAL
               </td>
@@ -181,19 +184,19 @@ export default function MonthlyEnquiryReport() {
         <h3 className="text-lg font-semibold mb-3">Color Legend:</h3>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-rose-200 rounded border"></div>
+            <div className="w-6 h-6 bg-rose-50 rounded border"></div>
             <span>APR, MAY, JUN, JAN, FEB, MAR (Rose/Cherry Light Red)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-cyan-200 rounded border"></div>
+            <div className="w-6 h-6 bg-cyan-50 rounded border"></div>
             <span>JUL, AUG, SEP (Cyan)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-purple-200 rounded border"></div>
+            <div className="w-6 h-6 bg-purple-50 rounded border"></div>
             <span>OCT, NOV, DEC (Purple Light)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-[#ebd42d] rounded border"></div>
+            <div className="w-6 h-6 bg-amber-200 rounded border"></div>
             <span>Total & Average Columns (Yellow)</span>
           </div>
         </div>

@@ -1,7 +1,4 @@
-import axios from "axios";
-import { baseApi } from "../../../uitils/commonApi";
-
-const BASE_URL = `${baseApi}/state`;
+import axiosInstance from "@/uitils/axiosInstance";
 
 export interface City {
   id: number;
@@ -13,22 +10,24 @@ export interface State {
   stateName: string;
 }
 
-// Sab states fetch karo
+// ─── GET ALL STATES ─────────────────────────
 export const getAllStatesApi = async (): Promise<State[]> => {
-  const res = await axios.get(`${BASE_URL}/`);
-  return res.data.data; // ApiResponse wrapper ka .data
+  const { data: res } = await axiosInstance.get("/state/");
+  return res.data;
 };
 
-// Sab cities fetch karo
+// ─── GET ALL CITIES ─────────────────────────
 export const getAllCitiesApi = async (): Promise<City[]> => {
-  const res = await axios.get(`${BASE_URL}/allcity`);
-  return res.data.data;
+  const { data: res } = await axiosInstance.get("/state/allcity");
+  return res.data;
 };
 
-// City ke basis pe states fetch karo ← YEH KEY FUNCTION HAI
-export const getStatesByCityApi = async (cityName: string): Promise<State[]> => {
-  const res = await axios.get(
-    `${BASE_URL}/states-by-city/${encodeURIComponent(cityName)}`
+// ─── GET STATES BY CITY ─────────────────────
+export const getStatesByCityApi = async (
+  cityName: string,
+): Promise<State[]> => {
+  const { data: res } = await axiosInstance.get(
+    `/state/states-by-city/${encodeURIComponent(cityName)}`,
   );
-  return res.data.data;
+  return res.data;
 };

@@ -1,6 +1,5 @@
-// E:\Pinnak\PINAK_FRONTEND\src\app\features\AnnualReport\annualReportApi.ts
-import axios from "axios";
-import { baseApi } from "../../../uitils/commonApi";
+import axiosInstance from "@/uitils/axiosInstance";
+import { baseApi } from "@/uitils/commonApi";
 
 export interface AnnualReportData {
   daysData: number[][];
@@ -17,45 +16,40 @@ interface ApiResponse {
   paxData: number[][];
 }
 
+// ─── GET ANNUAL REPORT ─────────────────────
 export const getAnnualReportApi = async (
   year: number,
 ): Promise<AnnualReportData> => {
   try {
-    // ✅ सही URL - backend route के अनुसार
-    const url = `${baseApi}/annualreport/annual-report`;
-
     console.log("🌐 Fetching Annual Report:");
-    console.log("🔍 Base URL:", baseApi);
-    console.log("🔍 Full URL:", url);
+    console.log("🔍 URL:", `/annualreport/annual-report`);
     console.log("🔍 Year:", year);
 
-    const response = await axios.get<ApiResponse>(url, {
-      params: { year },
-      timeout: 10000,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+    const { data: res, status } = await axiosInstance.get<ApiResponse>(
+      "/annualreport/annual-report",
+      {
+        params: { year },
+        timeout: 10000,
       },
-    });
+    );
 
-    console.log("✅ Response Status:", response.status);
-    console.log("✅ Response Data:", response.data);
+    console.log("✅ Response Status:", status);
+    console.log("✅ Response Data:", res);
 
-    if (response.data?.success) {
+    if (res?.success) {
       return {
-        daysData: response.data.daysData || [],
-        sourceData: response.data.sourceData || [],
-        paxData: response.data.paxData || [],
-        year: response.data.year,
+        daysData: res.daysData || [],
+        sourceData: res.sourceData || [],
+        paxData: res.paxData || [],
+        year: res.year,
       };
     }
 
-    // अगर success false है तो empty data return करें
     return {
       daysData: [],
       sourceData: [],
       paxData: [],
-      year: year,
+      year,
     };
   } catch (error: any) {
     console.error("❌ Annual Report API Error Details:", {
@@ -64,21 +58,22 @@ export const getAnnualReportApi = async (
       statusText: error.response?.statusText,
       data: error.response?.data,
       url: error.config?.url,
-      baseURL: error.config?.baseURL,
       params: error.config?.params,
     });
 
-    // Specific error messages
+    // ⏱️ Timeout
     if (error.code === "ECONNABORTED") {
       throw new Error("Request timeout - Server is taking too long");
     }
 
+    // 🌐 Server down / network issue
     if (!error.response) {
       throw new Error(
         `Cannot connect to server at ${baseApi}. Please check if backend is running`,
       );
     }
 
+    // ❌ 404 error
     if (error.response.status === 404) {
       throw new Error(
         `API endpoint not found: ${error.config?.url}. Please check backend routes`,
@@ -86,20 +81,21 @@ export const getAnnualReportApi = async (
     }
 
     throw new Error(
-      error.response.data?.message || `Server error: ${error.response.status}`,
+      error.response?.data?.message ||
+        `Server error: ${error.response?.status}`,
     );
   }
 };
 
-// Test connection function
+// ─── TEST CONNECTION ───────────────────────
 export const testAnnualReportConnection = async () => {
   try {
-    const testUrl = `${baseApi}/annualreport/test`; // अगर test endpoint बनाया हो
-    const response = await axios.get(testUrl);
+    const { data } = await axiosInstance.get("/annualreport/test");
+
     return {
       success: true,
       message: "Connected to annual report API",
-      data: response.data,
+      data,
     };
   } catch (error: any) {
     return {

@@ -20,34 +20,34 @@ const months = [
 const team30 = [
   {
     name: "RN",
-    color: "bg-blue-200",
-    bookColor: "bg-blue-200",
-    nameColor: "bg-blue-200",
+    color: "bg-blue-50",
+    bookColor: "bg-blue-50",
+    nameColor: "bg-blue-50",
 
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 5)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 2)),
   },
   {
     name: "CT",
-    color: "bg-emerald-200",
-    bookColor: "bg-emerald-200",
-    nameColor: "bg-emerald-200",
+    color: "bg-emerald-50",
+    bookColor: "bg-emerald-50",
+    nameColor: "bg-emerald-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 6)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 3)),
   },
   {
     name: "AM",
-    color: "bg-purple-200",
-    bookColor: "bg-purple-200",
-    nameColor: "bg-purple-200",
+    color: "bg-purple-50",
+    bookColor: "bg-purple-50",
+    nameColor: "bg-purple-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 4)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 2)),
   },
   {
     name: "SD",
-    color: "bg-amber-200",
-    bookColor: "bg-amber-200",
-    nameColor: "bg-amber-200",
+    color: "bg-amber-50",
+    bookColor: "bg-amber-50",
+    nameColor: "bg-amber-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 5)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 1)),
   },
@@ -56,25 +56,25 @@ const team30 = [
 const team60 = [
   {
     name: "JK",
-    color: "bg-indigo-200",
-    bookColor: "bg-indigo-200",
-    nameColor: "bg-indigo-200",
+    color: "bg-indigo-50",
+    bookColor: "bg-indigo-50",
+    nameColor: "bg-indigo-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 5)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 2)),
   },
   {
     name: "LP",
-    color: "bg-cyan-200",
-    bookColor: "bg-cyan-200",
-    nameColor: "bg-cyan-200",
+    color: "bg-cyan-50",
+    bookColor: "bg-cyan-50",
+    nameColor: "bg-cyan-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 6)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 3)),
   },
   {
     name: "MN",
-    color: "bg-rose-200",
-    bookColor: "bg-rose-200",
-    nameColor: "bg-rose-200",
+    color: "bg-rose-50",
+    bookColor: "bg-rose-50",
+    nameColor: "bg-rose-50",
     leads: Array.from({ length: 31 }, () => Math.floor(Math.random() * 5)),
     book: Array.from({ length: 31 }, () => Math.floor(Math.random() * 1)),
   },
@@ -94,8 +94,8 @@ export default function DailyLeadReport() {
     { teamName: "Team 60", members: team60 },
   ];
 
-  const cell = "border-r border-b border-black text-center px-1 py-1";
-  const headCell = "border-r border-b border-gray-400 px-2 py-2 text-center";
+  const cell = "border-r border-b border-gray-300 text-center px-1 py-1";
+  const headCell = "border-r border-b border-gray-300 px-2 py-2 text-center";
 
   const allTeamsTotalLeads = allTeams.reduce(
     (tAcc, team) =>
@@ -171,7 +171,7 @@ export default function DailyLeadReport() {
       <div className="overflow-x-auto">
         <table className="w-full border border-gray-400 border-separate border-spacing-0 text-md font-semibold">
           <thead>
-            <tr className="bg-indigo-800 text-white">
+            <tr className="bg-blue-950 text-white">
               <th className={headCell}>TEAM</th>
               <th className={headCell}>NAME</th>
               <th className={headCell}>STATUS</th>
@@ -180,16 +180,16 @@ export default function DailyLeadReport() {
                   {d + 1}
                 </th>
               ))}
-              <th className="border-b border-white bg-blue-800 text-white px-2 py-2 relative">
+              <th className="border-b border-white bg-blue-950 text-white px-2 py-2 relative">
                 TOTAL
                 {/* White border using outline */}
                 <div className="absolute inset-0 pointer-events-none border-r border-white"></div>
               </th>
-              <th className="border-b border-white bg-blue-800 text-white px-2 py-2 relative">
+              <th className="border-b border-white bg-blue-950 text-white px-2 py-2 relative">
                 AVG
                 <div className="absolute inset-0 pointer-events-none border-r border-white"></div>
               </th>
-              <th className="border-b border-white bg-blue-800 text-white px-2 py-2 relative">
+              <th className="border-b border-white bg-blue-950 text-white px-2 py-2 relative">
                 CNTB %
               </th>
             </tr>
@@ -247,18 +247,18 @@ export default function DailyLeadReport() {
                         ))}
 
                         <td
-                          className={`${cell} font-extrabold text-green-700 bg-[#ebd42d]`}
+                          className={`${cell} font-extrabold text-green-700 bg-amber-200`}
                         >
                           {totalLeads}
                         </td>
 
-                        <td className={`${cell} font-extrabold bg-[#ebd42d]`}>
+                        <td className={`${cell} font-extrabold bg-amber-200`}>
                           {avg}
                         </td>
 
                         <td
                           rowSpan={2}
-                          className="border-b border-gray-400 px-2 py-1 font-extrabold text-purple-700 bg-[#ebd42d]"
+                          className="border-b border-gray-400 px-2 py-1 font-extrabold text-purple-700 bg-amber-200"
                         >
                           {cntb}%
                         </td>
@@ -274,13 +274,13 @@ export default function DailyLeadReport() {
                         ))}
 
                         <td
-                          className={`${cell} font-extrabold text-red-600 bg-[#ebd42d]`}
+                          className={`${cell} font-extrabold text-red-600 bg-amber-200`}
                         >
                           {totalBook}
                         </td>
 
                         <td
-                          className={`${cell} font-extrabold text-red-600 bg-[#ebd42d]`}
+                          className={`${cell} font-extrabold text-red-600 bg-amber-200`}
                         >
                           -
                         </td>
@@ -290,7 +290,7 @@ export default function DailyLeadReport() {
                 })}
 
                 {/* TEAM TOTAL */}
-                <tr className="bg-[#F79A19] text-white font-extrabold">
+                <tr className="bg-amber-600 text-white font-extrabold">
                   <td colSpan={3} className={cell}>
                     Team Total
                   </td>
@@ -314,7 +314,7 @@ export default function DailyLeadReport() {
             ))}
 
             {/* ALL TEAMS TOTAL */}
-            <tr className="bg-blue-900 text-white font-extrabold text-xl h-10">
+            <tr className="bg-blue-950 text-white font-extrabold text-xl h-10">
               <td colSpan={3} className={cell}>
                 All Teams Total
               </td>

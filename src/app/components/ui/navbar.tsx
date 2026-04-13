@@ -479,7 +479,7 @@ export function Navbar({
 
                         {openMenu === "lead-track-menu" && (
                           <ul className="w-full md:absolute md:left-0 z-50 py-1 mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl md:top-full md:w-56 max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
-                            <li
+                            {/* <li
                               onClick={() => {
                                 onTransferLeads?.();
                                 setOpenMenu(null);
@@ -489,8 +489,8 @@ export function Navbar({
                             >
                               <span className="w-1 h-1 rounded-full bg-green-300"></span>
                               Transfer Leads
-                            </li>
-                            <li
+                            </li> */}
+                            {/* <li
                               onClick={() => {
                                 onSwapLeads?.();
                                 setOpenMenu(null);
@@ -500,7 +500,7 @@ export function Navbar({
                             >
                               <span className="w-1 h-1 rounded-full bg-green-300"></span>
                               Swap Leads
-                            </li>
+                            </li> */}
                             <li
                               onClick={() => {
                                 onMonthlyEnquiry?.();
