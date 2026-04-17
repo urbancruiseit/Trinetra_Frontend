@@ -252,7 +252,10 @@ export function Login() {
                           : "opacity-0 group-hover:opacity-50",
                       )}
                     />
-                    <div className="relative flex items-center">
+                    <div
+                      className="relative flex items-center"
+                      suppressHydrationWarning
+                    >
                       <User
                         size={16} // Reduced from 18 to 16
                         className={cn(
@@ -299,7 +302,10 @@ export function Login() {
                           : "opacity-0 group-hover:opacity-50",
                       )}
                     />
-                    <div className="relative flex items-center">
+                    <div
+                      className="relative flex items-center"
+                      suppressHydrationWarning
+                    >
                       <Lock
                         size={16} // Reduced from 18 to 16
                         className={cn(
