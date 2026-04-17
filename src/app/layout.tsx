@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Urbanatour Console",
-  description: "Black dashboard experience for Urbanatour",
+  title: "Trinetra",
+  description: "Trinetra Analytics System",
 };
 
 export default function RootLayout({
@@ -30,10 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       
         <ReduxProvider>
           {children}
-           <ToastContainer
+          <ToastContainer
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}

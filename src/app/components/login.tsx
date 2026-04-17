@@ -24,11 +24,10 @@ import {
 } from "lucide-react";
 
 type LoginFormValues = {
-  email: string;
+  username: string;
   password: string;
 };
 
-// Simple cn helper if you don't have one
 const cn = (...classes: (string | boolean | undefined | null)[]) =>
   classes.filter(Boolean).join(" ");
 
@@ -36,7 +35,7 @@ export function Login() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [serverError, setServerError] = useState(""); // ✅ fixed name
+  const [serverError, setServerError] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -203,15 +202,13 @@ export function Login() {
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
                   {" "}
-                  {/* Reduced from base to sm */}
                   <span>Sign in to your workspace</span>
                   <ArrowRight
-                    size={14} // Reduced from 16 to 14
+                    size={14}
                     className="text-green-600 animate-bounce-x"
                   />
                 </p>
               </div>
-              {/* ✅ Fixed: serverError instead of error */}
               {serverError && (
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-xl blur-xl transition-all group-hover:blur-2xl" />
@@ -230,67 +227,54 @@ export function Login() {
                   </div>
                 </div>
               )}
-              {/* ✅ Fixed: handleSubmit(onSubmit) */}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {" "}
-                {/* Reduced space from 6 to 4 */}
-                {/* Email */}
-                <div className="space-y-1">
-                  {" "}
-                  {/* Reduced space from 2 to 1 */}
-                  <label className="text-sm font-semibold text-black ml-1">
-                    {" "}
-                    {/* Reduced from md to sm */}
-                    Email
+                <div className="space-y-2">
+                  <label className="text-md font-semibold text-black ml-1">
+                    Username
                   </label>
                   <div className="relative group">
                     <div
                       className={cn(
                         "absolute inset-0 bg-gradient-to-r from-green-600/20 to-emerald-500/20 rounded-xl blur-xl transition-all duration-500",
-                        focusedField === "email"
+                        focusedField === "username"
                           ? "opacity-100"
                           : "opacity-0 group-hover:opacity-50",
                       )}
                     />
-                    <div
-                      className="relative flex items-center"
-                      suppressHydrationWarning
-                    >
+                    <div className="relative flex items-center">
                       <User
-                        size={16} // Reduced from 18 to 16
+                        size={18}
                         className={cn(
                           "absolute left-4 transition-all duration-300",
-                          focusedField === "email"
+                          focusedField === "username"
                             ? "text-green-600"
                             : "text-gray-400",
                         )}
                       />
                       <input
-                        type="email"
-                        {...register("email", {
-                          required: "Email is required",
+                        type="text"
+                        {...register("username", {
+                          required: "Username is required",
                         })}
-                        onFocus={() => setFocusedField("email")}
+                        onFocus={() => setFocusedField("username")}
                         onBlur={() => setFocusedField(null)}
-                        placeholder="Enter your email"
+                        placeholder="Enter your username"
                         disabled={isSubmitting}
-                        className="w-full pl-11 pr-4 h-10 rounded-xl border bg-white text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm" // Reduced height from 12 to 10
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
-                    {errors.email && (
+                    {errors.username && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
-                        {errors.email.message}
+                        {errors.username.message}
                       </p>
                     )}
                   </div>
                 </div>
-                {/* Password */}
                 <div className="space-y-1">
                   {" "}
-                  {/* Reduced space from 2 to 1 */}
                   <label className="text-sm font-semibold text-black ml-1">
                     {" "}
-                    {/* Reduced from md to sm */}
                     Password
                   </label>
                   <div className="relative group">
@@ -324,7 +308,7 @@ export function Login() {
                         onBlur={() => setFocusedField(null)}
                         placeholder="••••••••"
                         disabled={isSubmitting}
-                        className="w-full pl-11 pr-4 h-10 rounded-xl border bg-white text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm" // Reduced height from 12 to 10
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                       <button
                         type="button"

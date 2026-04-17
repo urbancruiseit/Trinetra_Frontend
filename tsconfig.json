@@ -22,13 +22,15 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
+"include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
-, "src/app/features/UnwantedLead/unwantedSlice.ts"  ],
+    "**/*.mts",
+    "src/types/**/*.d.ts",
+    "src/app/features/UnwantedLead/unwantedSlice.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -12,3 +12,14 @@ const axiosInstance = axios.create({
 });
 
 export default axiosInstance;
+
+export const baseApi1 =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1/";
+
+export const axiosInstance_hrms = axios.create({
+  baseURL: baseApi1,
+  withCredentials: true, // Sirf cookies bhejo
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
