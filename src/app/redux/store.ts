@@ -8,6 +8,8 @@ import stateCityReducer from "../features/State/stateSlice";
 import reportReducer from "../features/reports/reportsSlice";
 import annualReportReducer from "../features/AnnualReport/annualreportSlice";
 import HoursReportReducer from "../features/HoursReport/hoursreportsSlice";
+import countryReducer from "../features/countrycode/countrycodeSlice";
+import vehicleReducer from "../features/vehicle/vehicleSlice";
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +21,8 @@ export const store = configureStore({
     report: reportReducer,
     annualReport: annualReportReducer,
     hoursReport: HoursReportReducer,
+    country: countryReducer,
+    vehicle: vehicleReducer,
   },
 });
 
