@@ -100,7 +100,7 @@ export const updateLeadApi = async (
 export const markUnwantedApi = async (
   id: number,
   data: {
-    unwanted_status: "unwanted";
+    unwanted_status: "unwanted" | "wanted";
     reason?: string;
   },
 ) => {

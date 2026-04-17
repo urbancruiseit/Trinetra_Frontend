@@ -132,6 +132,8 @@ export interface LeadRecord {
   vehicle3Quantity?: string;
   vehicle2Quantity?: string;
   vehicle1Quantity?: string;
+  unwanted_status?: "unwanted" | "wanted";
+  unwanted_reason?: string;
   createdAt: string;
   updatedAt: string;
 }
