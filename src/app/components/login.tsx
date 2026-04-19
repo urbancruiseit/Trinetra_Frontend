@@ -116,7 +116,7 @@ export function Login() {
                     <Image
                       src={trinetraLogo}
                       alt="Trinetra Logo"
-                      className="w-full h-full object-contain p-6 drop-shadow-2xl"
+                      className="w-full h-full object-contain drop-shadow-2xl"
                     />
                   </div>
                 </div>
